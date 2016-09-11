@@ -1,0 +1,5 @@
+suites:
+    main:
+        namespace: weiwait\OnlineChess
+        psr4_prefix: weiwait\OnlineChess
+        src_path: app

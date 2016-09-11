@@ -1,0 +1,82 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+html, body {
+	width: 100%;
+	height: 100%;
+}
+.chess-wrap {
+    position: relative;
+    /*width: 80%;*/
+    /*height: 80%;*/
+    top: 50%;
+    left: 50%;
+}
+.chess-wrap table {
+    position: absolute;
+}
+.broad {
+    /*border: 1px solid #ccc;*/
+    /*width: 602px;*/
+    /*height: 602px;*/
+    /*top: 0;*/
+    /*left: 0;*/
+}
+.chess {
+    border: 1px solid #eee;
+    /*width: 562px;*/
+    /*height: 562px;*/
+    /*top: 20px;*/
+    /*left: 20px;*/
+}
+/*.chess-wrap td {*/
+	/*width: 38px;*/
+	/*height: 38px;*/
+/*}*/
+.broad td {
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    /*border: 1px solid #ccc;*/
+}
+.chess td {
+	border: 1px solid #ddd;
+}
+.registerPage {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #ddd;
+    opacity: 0.5;
+}
+.register {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -140px 0 0 -150px;
+    border-radius: 30px;
+    background: #bbb;
+}
+.register h1 {
+    text-align: center;
+    margin: 5px auto;
+    color: #666;
+}
+.register input {
+    text-indent: 10px;
+    display: block;
+    width: 260px;
+    height: 32px;
+    margin: 16px auto;
+    border-radius: 8px;
+    border: none;
+}
+.register input:last-child {
+    text-indent: 0;
+}
+
