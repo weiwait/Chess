@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OnlineChess</title>
-    <link rel="stylesheet" href="{{url('/css/style.css')}}">
+    <link rel="stylesheet" href="{{ url('/css/style.css') }}">
+    <script type="text/javascript" src="{{ url('/js/jquery-3.1.0.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url('/js/ajaxForm.js') }}"></script>
 </head>
 <body>
 <div class="chess-wrap">
@@ -497,7 +499,7 @@
     </table>
 </div>
 <button class="registerButton">register</button>
-<script type="text/javascript" src="{{url('/js/jquery-3.1.0.min.js')}}"></script>
+<button class="loginButton">login</button>
 <script>
     (function ($) {
         var user = 'blue';
@@ -672,25 +674,21 @@
 
         }
 
-        function registerSize()
-        {
-            var wrapSize = parseInt($('.chess-wrap').css('width'));
-            var registerWidth = wrapSize * 0.8;
-            var registerHeight = registerWidth * 0.8;
-            $('.register').css({
-                'width': registerWidth,
-                'height': registerHeight,
-                'margin-top': -registerHeight / 2,
-                'margin-left': -registerWidth /  2
-            });
-        }
-
         $(window).resize(function () {
             resetView();
         });
 
         $('.registerButton').click(function () {
+            {{--$('body').append(--}}
+                    {{--"<iframe src=\"{{ url('auth/register') }}\" frameborder=\"0\"></iframe>"--}}
+            {{--);--}}
             $.get("{{ url('auth/register') }}", function (page) {
+                $('body').append(page);
+            });
+        });
+
+        $('.loginButton').click(function () {
+            $.get("{{ url('auth/login') }}", function (page) {
                 $('body').append(page);
             });
         });

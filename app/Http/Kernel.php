@@ -18,6 +18,7 @@ class Kernel extends HttpKernel
         \Illuminate\Session\Middleware\StartSession::class,
         \Illuminate\View\Middleware\ShareErrorsFromSession::class,
         \weiwait\OnlineChess\Http\Middleware\VerifyCsrfToken::class,
+//        \weiwait\OnlineChess\Http\Middleware\LoginStatus::class,
     ];
 
     /**
@@ -29,5 +30,6 @@ class Kernel extends HttpKernel
         'auth' => \weiwait\OnlineChess\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => \weiwait\OnlineChess\Http\Middleware\RedirectIfAuthenticated::class,
+        'user' => \weiwait\OnlineChess\Http\Middleware\LoginStatus::class,
     ];
 }
