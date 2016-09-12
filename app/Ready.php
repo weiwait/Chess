@@ -8,5 +8,17 @@ class Ready extends Model
 {
     protected $table = 'ready';
 
-    protected $fillable = [];
+    public $timestamps = true;
+
+    protected $fillable = ['user_id', 'ready', 'victory'];
+
+    protected function getDateFormat()
+    {
+        return time();
+    }
+
+    protected function asDateTime($val)
+    {
+        return $val;
+    }
 }

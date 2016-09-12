@@ -15,7 +15,7 @@ class Ready extends Migration
     {
         Schema::create('ready', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('userId');
+            $table->integer('user_id');
             $table->integer('ready');
             $table->integer('victory');
             $table->timestamps();

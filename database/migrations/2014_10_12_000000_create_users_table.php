@@ -19,7 +19,6 @@ class CreateUsersTable extends Migration
             $table->string('password', 60);
             $table->integer('victory');
             $table->integer('defeated');
-            $table->renameColumn('name', 'username');
             $table->rememberToken();
             $table->timestamps();
         });
