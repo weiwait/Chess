@@ -39,6 +39,11 @@ class ReadyController extends Controller
 
     private function matching()
     {
+        $checkMe = $this->checkBeMatch($this->ready->id);
+        if ($checkMe != false) {
+            $data = ['opponent' => $checkMe->opponent, 'me' => false];
+            return $data;
+        }
         $opponent1 = Ready::where('victory', '<', $this->ready->victory)
             ->where(function ($query) {
                 $query->where('ready', 1);
@@ -51,11 +56,6 @@ class ReadyController extends Controller
             })
             ->orderBy('victory', 'asc')
             ->first();
-        $checkMe = $this->checkBeMatch($this->ready->id);
-        if ($checkMe != false) {
-            $data = ['opponent' => $checkMe->opponent, 'me' => false];
-            return $data;
-        }
         if ($opponent1 != null) {
             $checkOpponent1 = $this->checkBeMatch($opponent1->user_id);
             if ($checkOpponent1 == false) {
@@ -95,7 +95,7 @@ class ReadyController extends Controller
             }
         }
         sleep(5);
-        $this->matching();
+        return $this->matching();
     }
 
     private function checkBeMatch($id)
