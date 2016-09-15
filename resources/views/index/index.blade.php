@@ -500,6 +500,7 @@
 </div>
 <button class="registerButton">register</button>
 <button class="loginButton">login</button>
+<button class="fighting">ready</button>
 <script>
     (function ($) {
         var user = 'blue';
@@ -512,6 +513,9 @@
         var over = false;
         var me = true;
         var opponent = false;
+        var weiwaitSocket;
+        var userId = 0;
+        var opponentId = 0;
         (function initialize()
         {
             resetView();
@@ -577,10 +581,15 @@
             if (!me && opponent) {
                 return;
             }
-            me = false;
-            opponent = true;
             var x = e.target.cellIndex + 1;
             var y = e.target.parentElement.rowIndex + 1;
+            if (chessStatus[y][x]) {
+                me = false;
+                opponent = true;
+                weiwaitSocket.send(
+                        opponentId + "::{\"x\":" + x + ", \"y\":" + y + "}"
+                );
+            }
             putChess(x, y);
         });
 
@@ -603,6 +612,7 @@
                 chessStatus[y][x] = false;
             } else {
                 warning();
+                return;
             }
             var chess = chessFactory();
             //noinspection JSValidateTypes
@@ -692,6 +702,34 @@
                 $('body').append(page);
             });
         });
+
+        $('.fighting').click(function () {
+            $.get("{{ url('ready') }}", function (data) {
+                userId = data.self;
+                opponentId = data.opponentId;
+                me = data.me;
+                opponent = !me;
+                if (me) {
+                    alert('执蓝子');
+                } else {
+                    alert('执红子');
+                }
+                webSocket();
+            }, 'json');
+        });
+
+        function webSocket()
+        {
+            weiwaitSocket = new WebSocket('ws://linux.weiwait.top:8888');
+            weiwaitSocket.onopen = function () {
+                weiwaitSocket.send(userId);
+            };
+            weiwaitSocket.onmessage = function (data) {
+                var obj = JSON.parse(data.data);
+                remotePutChess(obj.x, obj.y);
+            };
+        }
+
     })(jQuery);
 </script>
 </body>

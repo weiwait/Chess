@@ -145,6 +145,7 @@ return [
         weiwait\OnlineChess\Providers\EventServiceProvider::class,
         weiwait\OnlineChess\Providers\RouteServiceProvider::class,
 
+        weiwait\OnlineChess\Providers\HttpClientProvider::class,
     ],
 
     /*

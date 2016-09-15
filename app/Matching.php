@@ -4,13 +4,13 @@ namespace weiwait\OnlineChess;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Ready extends Model
+class Matching extends Model
 {
-    protected $table = 'ready';
+    protected $table = 'matching';
 
     public $timestamps = true;
 
-    protected $fillable = ['user_id', 'ready', 'victory'];
+    protected $fillable = ['self', 'opponent'];
 
     public function freshTimestamp() {
         return time();

@@ -28,3 +28,5 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 
 
 Route::get('ready', 'ReadyController@ready');
+Route::get('unset-ready/{id}', 'ReadyController@unsetReady');
+
