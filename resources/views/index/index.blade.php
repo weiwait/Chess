@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+<?php
+$isLogin = 'false';
+if (Auth::user()) {
+    $isLogin = 'true';
+}
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -515,11 +520,18 @@
         var opponent = false;
         var weiwaitSocket;
         var userId = 0;
+        var username = '';
         var opponentId = 0;
+        var alreadyReady = false;
+        var status = false;
+        var timeOut;
+        var isOver = false;
+        var meWin = '';
+        window.isLogin = false;
         (function initialize()
         {
             resetView();
-
+            isLogin = {{$isLogin}};
             //标记棋盘 初始化所有格仔为true，可下棋状态 以坐标i为行j为列交点就是每个格仔;
             //同时声明赢法数组
             for (var i = 1; i < 16; i++) {
@@ -578,7 +590,7 @@
         })();
 
         $('.broad td').click(function (e) {
-            if (!me && opponent) {
+            if (!me && opponent || !status || isOver || over) {
                 return;
             }
             var x = e.target.cellIndex + 1;
@@ -587,14 +599,22 @@
                 me = false;
                 opponent = true;
                 weiwaitSocket.send(
-                        opponentId + "::{\"x\":" + x + ", \"y\":" + y + "}"
+                        opponentId + "::{\"index\":1,\"x\":" + x + ", \"y\":" + y + "}"
                 );
             }
             putChess(x, y);
+            timeOut = setTimeout(function () {
+                if (over) {
+                    clearTimeout(timeOut);
+                    return;
+                }
+                timeOutWin(userId, opponentId);
+            }, 45000);
         });
 
         function remotePutChess(x, y)
         {
+            clearTimeout(timeOut);
             if (me && !opponent) {
                 return;
             }
@@ -627,6 +647,9 @@
                         red[i] = 6;
                         if (blue[i] == 5) {
                             over = true;
+                            if (meWin == 'blue') {
+                                win(userId, opponentId);
+                            }
                             alert('blue win');
                         }
                     } else {
@@ -634,6 +657,9 @@
                         blue[i] = 6;
                         if (red[i] == 5) {
                             over = true;
+                            if (meWin == 'red') {
+                                win(userId, opponentId);
+                            }
                             alert('red win');
                         }
                     }
@@ -689,47 +715,108 @@
         });
 
         $('.registerButton').click(function () {
-            {{--$('body').append(--}}
-                    {{--"<iframe src=\"{{ url('auth/register') }}\" frameborder=\"0\"></iframe>"--}}
-            {{--);--}}
+            if (status) {
+                alert('waiting game end please');
+                return;
+            }
             $.get("{{ url('auth/register') }}", function (page) {
                 $('body').append(page);
             });
         });
 
         $('.loginButton').click(function () {
+            if (isLogin) {
+                alert('you are already login');
+                return;
+            }
             $.get("{{ url('auth/login') }}", function (page) {
                 $('body').append(page);
             });
         });
 
         $('.fighting').click(function () {
-            $.get("{{ url('ready') }}", function (data) {
-                userId = data.self;
-                opponentId = data.opponentId;
-                me = data.me;
-                opponent = !me;
-                if (me) {
-                    alert('执蓝子');
-                } else {
-                    alert('执红子');
-                }
-                webSocket();
-            }, 'json');
+            if (isLogin && !alreadyReady) {
+                setUserInfo();
+            } else {
+                alert('not login or alreadyReady');
+            }
+            alreadyReady = true;
         });
 
         function webSocket()
         {
             weiwaitSocket = new WebSocket('ws://linux.weiwait.top:8888');
             weiwaitSocket.onopen = function () {
+                console.log('connected');
+                matching();
                 weiwaitSocket.send(userId);
             };
             weiwaitSocket.onmessage = function (data) {
                 var obj = JSON.parse(data.data);
-                remotePutChess(obj.x, obj.y);
+                switch(obj.index) {
+                    case 1:
+                        remotePutChess(obj.x, obj.y);
+                        break;
+                    case 2:
+                        status = obj.status;
+                        break;
+                    case 3:
+                        isOver = obj.isOver;
+                        alert('you are timeOut');
+                        break;
+                }
             };
         }
 
+        function setUserInfo()
+        {
+            $.get("{{ url('user-info') }}", function (data) {
+                userId = data.id;
+                username = data.name;
+                if (!userId) {
+                    alert('server error');
+                    return;
+                }
+                webSocket();
+            }, 'json');
+        }
+
+        function matching()
+        {
+            $.get("{{ url('ready') }}", function (data) {
+                if (data.message) {
+                    alert('没有找到对手');
+                    return;
+                }
+                opponentId = data.opponentId;
+                me = data.me;
+                opponent = !me;
+                if (me) {
+                    meWin = 'blue';
+                    alert('执蓝子');
+                } else {
+                    meWin = 'red';
+                    alert('执红子');
+                }
+                weiwaitSocket.send(
+                        opponentId + "::{\"index\":2,\"status\":true}"
+                );
+            }, 'json');
+        }
+
+        function win(id, oid)
+        {
+            isOver = true;
+            $.get("{{url('win/')}}/"+id+"/"+oid);
+        }
+        function timeOutWin(id, oid)
+        {
+            isOver = true;
+            weiwaitSocket.send(
+                    opponentId + "::{\"index\":3,\"isOver\":true}"
+            );
+            $.get("{{url('win/')}}/"+id+"/"+oid);
+        }
     })(jQuery);
 </script>
 </body>

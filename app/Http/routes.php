@@ -30,3 +30,7 @@ Route::get('auth/logout', 'Auth\AuthController@getLogout');
 Route::get('ready', 'ReadyController@ready');
 Route::get('unset-ready/{id}', 'ReadyController@unsetReady');
 
+Route::get('user-info', 'ReadyController@getUserInfo');
+
+Route::get('win/{user_id}/{opponent_id}', 'ReadyController@win');
+

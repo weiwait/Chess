@@ -7,14 +7,16 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use weiwait\OnlineChess\Matching;
 use weiwait\OnlineChess\Ready;
+use weiwait\OnlineChess\User;
 
 class ReadyController extends Controller
 {
     private $ready;
+    private $matchingCount = 0;
 
     public function __construct()
     {
-//        set_time_limit(120);
+        set_time_limit(120);
         $this->ready = Auth::user();
     }
 
@@ -29,6 +31,9 @@ class ReadyController extends Controller
             ]);
         }
         $data = $this->matching();
+        if ($data == false) {
+            return ['message' => true];
+        }
         return $fighting = [
             'self' => $this->ready->id,
             'opponentId' => $data['opponent'],
@@ -39,20 +44,27 @@ class ReadyController extends Controller
 
     private function matching()
     {
+        $this->matchingCount++;
+        if ($this->matchingCount > 20) {
+            $this->unsetReady($this->ready->id);
+            return false;
+        }
         $checkMe = $this->checkBeMatch($this->ready->id);
         if ($checkMe != false) {
             $data = ['opponent' => $checkMe->opponent, 'me' => false];
             return $data;
         }
-        $opponent1 = Ready::where('victory', '<', $this->ready->victory)
+        $opponent1 = Ready::where('victory', '<=', $this->ready->victory)
             ->where(function ($query) {
                 $query->where('ready', 1);
+                $query->where('user_id', '!=', $this->ready->id);
             })
             ->orderBy('victory', 'desc')
             ->first();
-        $opponent2 = Ready::where('victory', '>', $this->ready->victory)
+        $opponent2 = Ready::where('victory', '=>', $this->ready->victory)
             ->where(function ($query) {
                 $query->where('ready', 1);
+                $query->where('user_id', '!=', $this->ready->id);
             })
             ->orderBy('victory', 'asc')
             ->first();
@@ -109,4 +121,16 @@ class ReadyController extends Controller
         Ready::where('user_id', $id)->delete();
         Matching::where('self', $id)->delete();
     }
+
+    public function getUserInfo()
+    {
+        return ['id' => $this->ready->id, 'name' => $this->ready->name];
+    }
+
+    public function win($user_id, $opponent_id)
+    {
+        User::where('id', $user_id)->increment('victory');
+        User::where('id', $opponent_id)->increment('defeated');
+    }
+
 }

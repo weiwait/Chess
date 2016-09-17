@@ -14,8 +14,8 @@
 <script class="registerScript">
     function ajaxSub() {
         $('#ajaxSub').ajaxSubmit(function (data) {
-            console.log(data.data);
             if (data) {
+                window.isLogin = true;
                 $('.message').css({
                     'transition': 'transform 1.5s',
                     'transform': 'translateY(120px)'
@@ -36,4 +36,5 @@
     function removeRegisterPage() {
         $('.registerPage, .register, .message, .registerScript').remove();
     }
+
 </script>
